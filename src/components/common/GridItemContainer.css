@@ -1,0 +1,13 @@
+.grid-item {
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    height: 100%;
+}
+
+.title-dropdown {
+    border: 1px solid #fff;
+    padding: 10px;
+    color: #3D4756;
+    font-weight: 700;
+    font-size: 16px;
+}
