@@ -35,15 +35,6 @@ const RechartsDetailView = () => {
   };
   
   return (
-    <>
-      {/*<div style={{fontSize: '20px', fontWeight: "bold"}}>레이아웃 추가</div>*/}
-      {/*<div>*/}
-      {/*    <label>레이아웃 이름</label>*/}
-      {/*    <input/>*/}
-      {/*</div>*/}
-      {/*<div style={{display: "flex"}}>*/}
-      {/*    <div style={{flex: 6, backgroundColor: 'lightblue'}}>*/}
-      {/*        <div>이미지 이동란</div>*/}
       <ResponsiveGridLayout
         className="layout"
         layout={layoutConfigTest}
@@ -62,12 +53,6 @@ const RechartsDetailView = () => {
           <GridItemContainer key={item} item={item}/>
         ))}
       </ResponsiveGridLayout>
-      {/*</div>*/}
-      {/*<div style={{flex: 4, backgroundColor: 'lightgreen'}}>*/}
-      {/*    <div>이미지 첨부</div>*/}
-      {/*</div>*/}
-      {/*</div>*/}
-    </>
   )
     ;
 };

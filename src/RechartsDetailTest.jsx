@@ -2,11 +2,11 @@ import React, {useState, useEffect} from 'react';
 import img01 from '../src/image/001.png';
 import img02 from '../src/image/002.png';
 import img03 from '../src/image/003.png';
-import layoutConfigTest from "./layoutConfigTest";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {useRecoilState} from 'recoil';
 import {breakpointState, layoutsState, layoutsStateTest} from '../src/recoil/atom';
 import layoutConfigState from "./layoutConfigState";
+import layoutConfigTest from "./layoutConfigTest";
 import layoutTwins from "./layoutTwins";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -37,22 +37,22 @@ const RechartsDetailTest = () => {
         };
         return [...prevImages, newImageObject];
       });
-
+      
       setImages(prevImages => prevImages.filter((img, index) => index !== parseInt(loadingImage.index)));
-
+      
       updateLayouts(loadingImage);
-
+      
       setLoadingImage(null);
     }
   }, [loadingImage]);
   
   const updateLayouts = (newImage) => {
     const newLayoutItem = {
-      i: `${droppedImages.length}`,  // 유니크한 key
+      i: `${droppedImages.length}`,
       x: 0,
       y: Infinity, // 가장 아래에 배치
-      w: Math.ceil(newImage.width / 100), // 이미지 너비에 따라 너비 조정
-      h: Math.ceil(newImage.height / 100), // 이미지 높이에 따라 높이 조정
+      w: Math.ceil(newImage.width / 100),
+      h: Math.ceil(newImage.height / 100),
     };
     setLayouts(prevLayouts => ({
       ...prevLayouts,
@@ -85,7 +85,7 @@ const RechartsDetailTest = () => {
   };
   
   const handleDragOver = (event) => {
-    event.preventDefault(); // 이벤트의 기본 동작을 방지해야 드롭이 가능
+    event.preventDefault();
   };
   
   const getLayouts = () => {
@@ -113,7 +113,7 @@ const RechartsDetailTest = () => {
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           style={{flex: 8, backgroundColor: 'lightblue', height: '100vh'}}>
-          {/*<div>이미지 이동란</div>*/}
+          <div>이미지 이동란</div>
           <ResponsiveGridLayout
             className="layout"
             layout={layoutTwins}
