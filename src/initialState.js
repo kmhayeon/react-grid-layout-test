@@ -1,5 +1,7 @@
 import layoutConfig from "./layoutConfig";
 import chatsJSlayoutConfig from "./chatsJSlayoutConfig";
+import layoutConfigTest from "./layoutConfigTest";
+import layoutConfigState from "./layoutConfigState";
 
 const initialState = {
   data: {
@@ -567,7 +569,9 @@ const initialState = {
     }
   },
   layouts: layoutConfig,
+  // layouts: layoutConfigTest,
   chartLayout: chatsJSlayoutConfig,
+  layoutTest: layoutConfigState,
   breakpoint: "lg",
   breakpoints: "lg"
 };

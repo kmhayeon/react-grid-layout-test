@@ -16,6 +16,11 @@ export const layoutsState = atom({
   default: initialState.layouts,
 });
 
+export const layoutsStateTest = atom({
+  key: 'layoutsStateTest',
+  default: initialState.layoutTest,
+});
+
 export const breakpointState = atom({
   key: 'breakpointState',
   default: initialState.breakpoint,
@@ -40,5 +45,10 @@ export const setType = selectorFamily({
       [root]: newValue
     }));
   }
+});
+
+export const movedItemsState = atom({
+  key: 'movedItemsState',
+  default: [],
 });
 

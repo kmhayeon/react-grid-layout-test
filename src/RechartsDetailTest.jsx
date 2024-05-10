@@ -1,74 +1,156 @@
-import React, {useEffect} from 'react';
-import {Responsive, WidthProvider} from 'react-grid-layout';
-import {useRecoilState} from 'recoil';
-import GridItemContainer from '../src/components/common/GridItemContainer';
-import {dataState, breakpointState, layoutsState} from '../src/recoil/atom';
+import React, {useState, useEffect} from 'react';
+import img01 from '../src/image/001.png';
+import img02 from '../src/image/002.png';
+import img03 from '../src/image/003.png';
 import layoutConfigTest from "./layoutConfigTest";
+import {Responsive, WidthProvider} from "react-grid-layout";
+import {useRecoilState} from 'recoil';
+import {breakpointState, layoutsState, layoutsStateTest} from '../src/recoil/atom';
+import layoutConfigState from "./layoutConfigState";
+import layoutTwins from "./layoutTwins";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const RechartsDetailView = () => {
-    const [data, setData] = useRecoilState(dataState);
-    const [currentBreakpoint, setCurrentBreakpoint] = useRecoilState(breakpointState);
-    const [layouts, setLayouts] = useRecoilState(layoutsState);
-    const dataArray = Object.keys(data);
+const RechartsDetailTest = () => {
+  const [images, setImages] = useState([img01, img02, img03]);
+  const [droppedImages, setDroppedImages] = useState([]);
+  const [loadingImage, setLoadingImage] = useState(null);
+  const [layouts, setLayouts] = useRecoilState(layoutsStateTest);
+  const [currentBreakpoint, setCurrentBreakpoint] = useRecoilState(breakpointState);
+  const dataArray = Object.keys(images);
+  
+  useEffect(() => {
+    const savedLayouts = localStorage.getItem('layouts');
+    if (savedLayouts) {
+      setLayouts(JSON.parse(savedLayouts));
+    }
+  }, []);
+  
+  
+  useEffect(() => {
+    if (loadingImage) {
+      setDroppedImages(prevImages => {
+        const newImageObject = {
+          src: loadingImage.src,
+          width: loadingImage.width,
+          height: loadingImage.height
+        };
+        return [...prevImages, newImageObject];
+      });
 
-    useEffect(() => {
-        const savedLayouts = localStorage.getItem('layouts');
-        if (savedLayouts) {
-            setLayouts(JSON.parse(savedLayouts));
-        }
-    }, []);
+      setImages(prevImages => prevImages.filter((img, index) => index !== parseInt(loadingImage.index)));
 
-    const getLayouts = () => {
-        const savedLayouts = localStorage.getItem('layouts');
-        return savedLayouts ? JSON.parse(savedLayouts) : layouts;
+      updateLayouts(loadingImage);
+
+      setLoadingImage(null);
+    }
+  }, [loadingImage]);
+  
+  const updateLayouts = (newImage) => {
+    const newLayoutItem = {
+      i: `${droppedImages.length}`,  // 유니크한 key
+      x: 0,
+      y: Infinity, // 가장 아래에 배치
+      w: Math.ceil(newImage.width / 100), // 이미지 너비에 따라 너비 조정
+      h: Math.ceil(newImage.height / 100), // 이미지 높이에 따라 높이 조정
     };
-
-    const handleLayoutChange = (newLayout, allLayouts) => {
-        localStorage.setItem('layouts', JSON.stringify(allLayouts));
-        setLayouts(allLayouts);
+    setLayouts(prevLayouts => ({
+      ...prevLayouts,
+      lg: [...prevLayouts.lg, newLayoutItem]
+    }));
+  };
+  
+  console.log(layouts)
+  
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const imageIndex = event.dataTransfer.getData("imageId");
+    const image = images[imageIndex];
+    
+    const tempImg = new Image();
+    tempImg.onload = () => {
+      const imageWidth = tempImg.width;
+      const imageHeight = tempImg.height;
+      setLoadingImage({
+        src: image,
+        width: imageWidth,
+        height: imageHeight,
+        index: imageIndex
+      });
     };
-
-    const handleBreakPointChange = (breakpoint) => {
-        setCurrentBreakpoint(breakpoint);
+    tempImg.onerror = () => {
+      console.error('Failed to load the image:', image);
     };
-
-    return (
-        <>
-            <div style={{fontSize: '20px', fontWeight: "bold"}}>레이아웃 추가</div>
-            <div>
-                <label>레이아웃 이름</label>
-                <input/>
-            </div>
-            <div style={{display: "flex"}}>
-                <div style={{flex: 6, backgroundColor: 'lightblue'}}>
-                    <div>이미지 이동란</div>
-                    <ResponsiveGridLayout
-                        className="layout"
-                        layout={layoutConfigTest}
-                        layouts={getLayouts()}
-                        onBreakpointChange={handleBreakPointChange}
-                        onLayoutChange={handleLayoutChange}
-                        isDraggable
-                        isRearrangeable
-                        isResizable
-                        draggableHandle=".grid-item__title"
-                        breakpoints={{lg: 1280, md: 992, sm: 767, xs: 480, xxs: 0}}
-                        cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
-                        width={1200}
-                    >
-                        {dataArray.map((item, index) => (
-                            <GridItemContainer key={item} item={item}/>
-                        ))}
-                    </ResponsiveGridLayout></div>
-                <div style={{flex: 4, backgroundColor: 'lightgreen'}}>
-                    <div>이미지 첨부</div>
-                </div>
-            </div>
-        </>
-    )
-        ;
+    tempImg.src = image;
+  };
+  
+  const handleDragOver = (event) => {
+    event.preventDefault(); // 이벤트의 기본 동작을 방지해야 드롭이 가능
+  };
+  
+  const getLayouts = () => {
+    const savedLayouts = localStorage.getItem('layouts');
+    return savedLayouts ? JSON.parse(savedLayouts) : layouts;
+  };
+  
+  const handleBreakPointChange = (breakpoint) => {
+    setCurrentBreakpoint(breakpoint);
+  };
+  
+  const handleLayoutChange = (newLayout, allLayouts) => {
+    localStorage.setItem('layouts', JSON.stringify(allLayouts));
+    setLayouts(allLayouts);
+  };
+  
+  const handleDragStart = (event, image) => {
+    event.dataTransfer.setData("imageId", images.indexOf(image));
+  };
+  
+  return (
+    <>
+      <div style={{display: "flex"}}>
+        <div
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          style={{flex: 8, backgroundColor: 'lightblue', height: '100vh'}}>
+          {/*<div>이미지 이동란</div>*/}
+          <ResponsiveGridLayout
+            className="layout"
+            layout={layoutTwins}
+            layouts={getLayouts()}
+            onBreakpointChange={handleBreakPointChange}
+            onLayoutChange={handleLayoutChange}
+            isDraggable
+            isRearrangeable
+            isResizable
+            breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
+            cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
+            width={1200}
+          >
+            {droppedImages.map((image, index) => (
+              <div key={index} style={{width: `${image.width}px`, height: `${image.height}px`, overflow: 'hidden'}}>
+                <img src={image.src} alt={`Dropped image ${index}`}
+                     style={{width: '100%', height: 'auto'}}/>
+              </div>
+            ))}
+          </ResponsiveGridLayout>
+        </div>
+        <div style={{flex: 4, backgroundColor: 'lightgreen', height: '100vh'}}>
+          <div>이미지 첨부</div>
+          {images.map((image, index) => (
+            <img
+              key={index}
+              src={image}
+              alt={`Image ${index + 1}`}
+              draggable="true"
+              onDragStart={(e) => handleDragStart(e, image)}
+              style={{width: '100%', height: 'auto'}}
+            />
+          ))}
+        </div>
+      </div>
+    </>
+  );
 };
 
-export default RechartsDetailView;
+export default RechartsDetailTest;
