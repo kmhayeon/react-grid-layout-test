@@ -17,12 +17,21 @@ const RechartsDetailTest = () => {
   const [loadingImage, setLoadingImage] = useState(null);
   const [layouts, setLayouts] = useRecoilState(layoutsStateTest);
   const [currentBreakpoint, setCurrentBreakpoint] = useRecoilState(breakpointState);
-  const dataArray = Object.keys(images);
   
   useEffect(() => {
-    const savedLayouts = localStorage.getItem('layouts');
-    if (savedLayouts) {
-      setLayouts(JSON.parse(savedLayouts));
+    // 드랍된 이미지 목록 불러오기
+    const savedDroppedImages = localStorage.getItem('droppedImages');
+    if (savedDroppedImages) {
+      setDroppedImages(JSON.parse(savedDroppedImages));
+    }
+    
+    // 현재 이미지 목록 불러오기
+    const savedImages = localStorage.getItem('images');
+    if (savedImages) {
+      setImages(JSON.parse(savedImages));
+    }
+    else {
+      setImages([img01, img02, img03]); // 로컬 스토리지에 없을 경우 초기 이미지 목록 설정
     }
   }, []);
   
@@ -35,16 +44,24 @@ const RechartsDetailTest = () => {
           width: loadingImage.width,
           height: loadingImage.height
         };
-        return [...prevImages, newImageObject];
+        const updatedImages = [...prevImages, newImageObject];
+        localStorage.setItem('droppedImages', JSON.stringify(updatedImages));
+        return updatedImages;
       });
       
-      setImages(prevImages => prevImages.filter((img, index) => index !== parseInt(loadingImage.index)));
+      setImages(prevImages => {
+        const updatedImages = prevImages.filter((img, index) => index !== parseInt(loadingImage.index));
+        // 현재 이미지 목록 업데이트를 로컬 스토리지에 저장
+        localStorage.setItem('images', JSON.stringify(updatedImages));
+        return updatedImages;
+      });
       
       updateLayouts(loadingImage);
       
       setLoadingImage(null);
     }
   }, [loadingImage]);
+  
   
   const updateLayouts = (newImage) => {
     const newLayoutItem = {
@@ -59,8 +76,6 @@ const RechartsDetailTest = () => {
       lg: [...prevLayouts.lg, newLayoutItem]
     }));
   };
-  
-  console.log(layouts)
   
   const handleDrop = (event) => {
     event.preventDefault();
@@ -116,7 +131,7 @@ const RechartsDetailTest = () => {
           <div>이미지 이동란</div>
           <ResponsiveGridLayout
             className="layout"
-            layout={layoutTwins}
+            layout={layoutConfigState.lg}
             layouts={getLayouts()}
             onBreakpointChange={handleBreakPointChange}
             onLayoutChange={handleLayoutChange}
