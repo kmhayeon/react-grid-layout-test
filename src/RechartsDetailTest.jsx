@@ -130,7 +130,7 @@ const RechartsDetailTest = () => {
             {droppedImages.map((image, index) => (
               <div key={index} style={{width: `${image.width}px`, height: `${image.height}px`, overflow: 'hidden'}}>
                 <img src={image.src} alt={`Dropped image ${index}`}
-                     style={{width: '100%', height: 'auto'}}/>
+                     style={{width: '100%', height: '100%'}}/>
               </div>
             ))}
           </ResponsiveGridLayout>
